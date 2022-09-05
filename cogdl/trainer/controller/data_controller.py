@@ -6,18 +6,18 @@ from cogdl.wrappers.data_wrapper.base_data_wrapper import OnLoadingWrapper
 
 class DataController(object):
     def __init__(self, world_size: int = 1, distributed: bool = False):
-        self.world_size = world_size
-        self.distributed = distributed
+        self.world_size = world_size                        # 词大小
+        self.distributed = distributed                      # 分布式
 
     def distributed_dataloader(self, dataloader: DataLoader, dataset, rank):
         # TODO: just a toy implementation
         assert isinstance(dataloader, DataLoader)
 
-        args, kwargs = dataloader.get_parameters()
+        args, kwargs = dataloader.get_parameters()          # 获取参数
         sampler = torch.utils.data.distributed.DistributedSampler(dataset, num_replicas=self.world_size, rank=rank)
-        kwargs["sampler"] = sampler
+        kwargs["sampler"] = sampler                         # 样本
         dataloader = dataloader.__class__(*args, **kwargs)
-        return dataloader
+        return dataloader                                   # 数据加载
 
     def prepare_data_wrapper(self, dataset_w, rank=0):
         if self.distributed:
@@ -47,4 +47,4 @@ class DataController(object):
                 dataset_w.__train_data = train_wrapper
             else:
                 dataset_w.prepare_training_data()
-        return dataset_w
+        return dataset_w                                    # 数据集

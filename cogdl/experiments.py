@@ -120,8 +120,8 @@ def train(args):  # noqa: C901
     else:
         dataset = build_dataset(args)
 
-    mw_class = fetch_model_wrapper(args.mw)
-    dw_class = fetch_data_wrapper(args.dw)
+    mw_class = fetch_model_wrapper(args.mw)         # 初始化模型
+    dw_class = fetch_data_wrapper(args.dw)          # 初始化数据
 
     if mw_class is None:
         raise NotImplementedError("`model wrapper(--mw)` must be specified.")
@@ -143,17 +143,17 @@ def train(args):  # noqa: C901
     # setup data_wrapper
     dataset_wrapper = dw_class(dataset, **data_wrapper_args)
 
-    args.num_features = dataset.num_features
+    args.num_features = dataset.num_features        # 数据集特征
     if hasattr(dataset, "num_nodes"):
-        args.num_nodes = dataset.num_nodes
+        args.num_nodes = dataset.num_nodes          # 数据节点
     if hasattr(dataset, "num_edges"):
-        args.num_edges = dataset.num_edges
+        args.num_edges = dataset.num_edges          # 数据边
     if hasattr(dataset, "num_edge"):
-        args.num_edge = dataset.num_edge
+        args.num_edge = dataset.num_edge            # 数据边的
     if hasattr(dataset, "max_graph_size"):
-        args.max_graph_size = dataset.max_graph_size
+        args.max_graph_size = dataset.max_graph_size    # 最大图大小
     if hasattr(dataset, "edge_attr_size"):
-        args.edge_attr_size = dataset.edge_attr_size
+        args.edge_attr_size = dataset.edge_attr_size    # 边属性大小
     else:
         args.edge_attr_size = [0]
     if hasattr(args, "unsup") and args.unsup:
@@ -176,13 +176,13 @@ def train(args):  # noqa: C901
         n_warmup_steps=args.n_warmup_steps,
         epochs=args.epochs,
         batch_size=args.batch_size if hasattr(args, "batch_size") else 0,
-    )
+    )                                                                               # 优化
 
     if hasattr(args, "hidden_size"):
         optimizer_cfg["hidden_size"] = args.hidden_size
 
-    # setup model_wrapper
-    if isinstance(args.mw, str) and "embedding" in args.mw:
+    # setup model_wrapper                                           模型注入
+    if isinstance(args.mw, str) and "embedding" in args.mw:         # 判断是否有embedding
         model_wrapper = mw_class(model, **model_wrapper_args)
     else:
         model_wrapper = mw_class(model, optimizer_cfg, **model_wrapper_args)
@@ -198,8 +198,8 @@ def train(args):  # noqa: C901
         load_emb_path=args.load_emb_path,
         cpu_inference=args.cpu_inference,
         progress_bar=args.progress_bar,
-        distributed_training=args.distributed,
-        checkpoint_path=args.checkpoint_path,
+        distributed_training=args.distributed,                  # 分布式训练
+        checkpoint_path=args.checkpoint_path,                   #
         resume_training=args.resume_training,
         patience=args.patience,
         eval_step=args.eval_step,
@@ -209,7 +209,7 @@ def train(args):  # noqa: C901
         return_model=args.return_model,
         nstage=args.nstage,
         actnn=args.actnn,
-        fp16=args.fp16,
+        fp16=args.fp16,                                         # 是否采用浮点16
         do_test=args.do_test,
         do_valid=args.do_valid,
     )
@@ -257,8 +257,10 @@ def getpid(_):
 
 
 def raw_experiment(args):
+    # 获取实验列表
     variants = list(gen_variants(dataset=args.dataset, model=args.model, seed=args.seed, split=args.split))
 
+    # 结果字典
     results_dict = defaultdict(list)
     if len(args.devices) == 1 or args.cpu or args.distributed:
         results = [train(args) for args in variant_args_generator(args, variants)]
@@ -268,18 +270,18 @@ def raw_experiment(args):
         mp.set_start_method("spawn", force=True)
 
         # Make sure datasets are downloaded first
-        datasets = args.dataset
+        datasets = args.dataset                             # 数据集
         for dataset in datasets:
             args.dataset = dataset
             build_dataset(args)
         args.dataset = datasets
 
-        num_workers = len(args.devices)
-        with mp.Pool(processes=num_workers) as pool:
+        num_workers = len(args.devices)                     # 设备的数量
+        with mp.Pool(processes=num_workers) as pool:        #
             pids = pool.map(getpid, range(num_workers))
             args.pid_to_cuda = dict(zip(pids, args.devices))
 
-            results = pool.map(train_parallel, variant_args_generator(args, variants))
+            results = pool.map(train_parallel, variant_args_generator(args, variants))      # 结果
             for variant, result in zip(variants, results):
                 results_dict[variant[:-2]].append(result)
 
@@ -289,8 +291,8 @@ def raw_experiment(args):
     return results_dict
 
 
-def auto_experiment(args):
-    variants = list(gen_variants(dataset=args.dataset, model=args.model))
+def auto_experiment(args):                                                          # 自动实验
+    variants = list(gen_variants(dataset=args.dataset, model=args.model))           #
 
     results_dict = defaultdict(list)
     for variant in variants:
@@ -322,31 +324,31 @@ def default_search_space(trial):
     }
 
 
-def experiment(dataset, model=None, **kwargs):
+def experiment(dataset, model=None, **kwargs):                          # 实验
     if model is None:
-        model = "autognn"
-    if isinstance(dataset, str) or isinstance(dataset, Dataset):
+        model = "autognn"                                               # 自动gnn
+    if isinstance(dataset, str) or isinstance(dataset, Dataset):        # 判断是否为dataset
         dataset = [dataset]
-    if isinstance(model, str) or isinstance(model, nn.Module):
+    if isinstance(model, str) or isinstance(model, nn.Module):          # 判断是否是模型
         model = [model]
     if "args" not in kwargs:
-        args = get_default_args(dataset=[str(x) for x in dataset], model=[str(x) for x in model], **kwargs)
+        args = get_default_args(dataset=[str(x) for x in dataset], model=[str(x) for x in model], **kwargs)     # 获取默认参数
     else:
         args = kwargs["args"]
         for key, value in kwargs.items():
             if key != "args":
                 args.__setattr__(key, value)
     if isinstance(model[0], nn.Module):
-        args.model = [x.model_name for x in model]
+        args.model = [x.model_name for x in model]                      # 模型名称
     print(args)
     args.dataset = dataset
     args.model = model
 
     if args.max_epoch is not None:
         warnings.warn("The max_epoch is deprecated and will be removed in the future, please use epochs instead!")
-        args.epochs = args.max_epoch
+        args.epochs = args.max_epoch                                # 最大epoch
 
-    if len(model) == 1 and isinstance(model[0], str) and model[0] == "autognn":
+    if len(model) == 1 and isinstance(model[0], str) and model[0] == "autognn":             # 搜索空间
         if not hasattr(args, "search_space"):
             args.search_space = default_search_space
         if not hasattr(args, "seed"):
@@ -355,6 +357,6 @@ def experiment(dataset, model=None, **kwargs):
             args.n_trials = 20
 
     if hasattr(args, "search_space"):
-        return auto_experiment(args)
+        return auto_experiment(args)                                # 如果有搜索空间， 进行批量实验
 
-    return raw_experiment(args)
+    return raw_experiment(args)                                     # 如果没有，就单个实验

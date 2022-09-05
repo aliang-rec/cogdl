@@ -148,14 +148,14 @@ def get_diff_args(args1, args2):
 def parse_args_and_arch(parser, args):
     # Add *-specific args to parser.
     for model in args.model:
-        try_adding_model_args(model, parser)
+        try_adding_model_args(model, parser)            # 正常导入包
 
     for dataset in args.dataset:
-        try_adding_dataset_args(dataset, parser)
+        try_adding_dataset_args(dataset, parser)        # 导入数据集
 
     if len(args.model) > 1:
         warnings.warn("Please ensure that models could use the same model wrapper!")
-    default_wrappers = get_wrappers_name(args.model[0])
+    default_wrappers = get_wrappers_name(args.model[0])     # 获取刷新的名字
     if default_wrappers is not None:
         mw, dw = default_wrappers
     else:

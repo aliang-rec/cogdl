@@ -150,9 +150,9 @@ class ModelWrapper(torch.nn.Module):
 
     def set_evaluation_metric(self):
         if isinstance(self._evaluator, MultiLabelMicroF1):
-            self._evaluator_metric = "micro_f1"
+            self._evaluator_metric = "micro_f1"                 # f1 评价指标
         elif isinstance(self._evaluator, Accuracy):
-            self._evaluator_metric = "acc"
+            self._evaluator_metric = "acc"                      # acc 评价指标
         else:
             evaluation_metric = self.set_early_stopping()
             if not isinstance(evaluation_metric, str):

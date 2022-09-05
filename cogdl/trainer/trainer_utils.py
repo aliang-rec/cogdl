@@ -68,7 +68,7 @@ def save_model(model, path, epoch):
 
 def load_model(model, path):
     print(f"Loading model from {path} ...")
-    model.load_state_dict(torch.load(path))
+    model.load_state_dict(torch.load(path))         #
     return model
 
 

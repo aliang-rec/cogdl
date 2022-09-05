@@ -100,7 +100,7 @@ class Trainer(object):
             warnings.warn("The max_epoch is deprecated and will be removed in the future, please use epochs instead!")
             self.epochs = max_epoch
 
-        self.cpu = cpu
+        self.cpu = cpu                                                      # cpu
         self.devices, self.world_size = self.set_device(device_ids)
         self.checkpoint_path = checkpoint_path
         self.resume_training = resume_training
@@ -122,9 +122,9 @@ class Trainer(object):
         self.save_emb_path = save_emb_path
         self.load_emb_path = load_emb_path
 
-        self.data_controller = DataController(world_size=self.world_size, distributed=self.distributed_training)
+        self.data_controller = DataController(world_size=self.world_size, distributed=self.distributed_training)  # 数据控制
 
-        self.logger = build_logger(logger, log_path, project)
+        self.logger = build_logger(logger, log_path, project)       # 创建日志
 
         self.after_epoch_hooks = []
         self.pre_epoch_hooks = []
@@ -183,7 +183,7 @@ class Trainer(object):
     def run(self, model_w: ModelWrapper, dataset_w: DataWrapper):
         # for network/graph embedding models
         if isinstance(model_w, EmbeddingModelWrapper):
-            return EmbeddingTrainer(self.save_emb_path, self.load_emb_path).run(model_w, dataset_w)
+            return EmbeddingTrainer(self.save_emb_path, self.load_emb_path).run(model_w, dataset_w)     # 模型训练器
 
         print("Model Parameters:", sum(p.numel() for p in model_w.parameters()))
 
@@ -192,9 +192,9 @@ class Trainer(object):
         # mainly for in-cogdl setting
         model_w.default_loss_fn = dataset_w.get_default_loss_fn()
         model_w.default_evaluator = dataset_w.get_default_evaluator()
-        model_w.set_evaluation_metric()
+        model_w.set_evaluation_metric()                                             # 设置评价指标
 
-        if self.resume_training:
+        if self.resume_training:                            # 重载模型
             model_w = load_model(model_w, self.checkpoint_path).to(self.devices[0])
 
         if self.distributed_training:
@@ -303,9 +303,9 @@ class Trainer(object):
             return model_w.to(rank), None
 
     def train(self, rank, model_w, dataset_w):  # noqa: C901
-        model_w, _ = self.initialize(model_w, rank=rank, master_addr=self.master_addr, master_port=self.master_port)
-        self.data_controller.prepare_data_wrapper(dataset_w, rank)
-        self.eval_data_back_to_cpu = dataset_w.data_back_to_cpu
+        model_w, _ = self.initialize(model_w, rank=rank, master_addr=self.master_addr, master_port=self.master_port)    # 初始化服务
+        self.data_controller.prepare_data_wrapper(dataset_w, rank)              # 注入数据
+        self.eval_data_back_to_cpu = dataset_w.data_back_to_cpu                 # 是否返回cpu
 
         optimizers, lr_schedulers = self.build_optimizer(model_w)
         if optimizers[0] is None:

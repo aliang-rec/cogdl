@@ -38,11 +38,11 @@ class GATNE(BaseModel):
         """Add model-specific arguments to the parser."""
         # fmt: off
         parser.add_argument('--walk-length', type=int, default=10,
-                            help='Length of walk per source. Default is 10.')
+                            help='Length of walk per source. Default is 10.')       # 游走长度
         parser.add_argument('--walk-num', type=int, default=10,
-                            help='Number of walks per source. Default is 10.')
+                            help='Number of walks per source. Default is 10.')      # 游走次数
         parser.add_argument('--window-size', type=int, default=5,
-                            help='Window size of skip-gram model. Default is 5.')
+                            help='Window size of skip-gram model. Default is 5.')   # 滑窗大小
         parser.add_argument('--worker', type=int, default=10,
                             help='Number of parallel workers. Default is 10.')
         parser.add_argument('--epochs', type=int, default=20,
@@ -50,23 +50,23 @@ class GATNE(BaseModel):
         parser.add_argument('--batch-size', type=int, default=256,
                             help='Number of batch_size. Default is 256.')
         parser.add_argument('--edge-dim', type=int, default=10,
-                            help='Number of edge embedding dimensions. Default is 10.')
+                            help='Number of edge embedding dimensions. Default is 10.')     # 边的长度
         parser.add_argument('--att-dim', type=int, default=20,
-                            help='Number of attention dimensions. Default is 20.')
+                            help='Number of attention dimensions. Default is 20.')          # att-维度
         parser.add_argument('--negative-samples', type=int, default=5,
-                            help='Negative samples for optimization. Default is 5.')
+                            help='Negative samples for optimization. Default is 5.')        # 负采样
         parser.add_argument('--neighbor-samples', type=int, default=10,
-                            help='Neighbor samples for aggregation. Default is 10.')
+                            help='Neighbor samples for aggregation. Default is 10.')        # 邻居数量
         parser.add_argument('--schema', type=str, default=None,
-                            help="Input schema for metapath random walk.")
+                            help="Input schema for metapath random walk.")                  # 游走方式
         # fmt: on
 
     @classmethod
     def build_model_from_args(cls, args):
         return cls(
-            args.hidden_size,
-            args.walk_length,
-            args.walk_num,
+            args.hidden_size,                       # 隐藏层
+            args.walk_length,                       # 游走长度
+            args.walk_num,                          # 游走次数
             args.window_size,
             args.worker,
             args.epochs,

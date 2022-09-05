@@ -30,7 +30,7 @@ def try_adding_model_args(model, parser):
         getattr(module, class_name).add_args(parser)
 
 
-def build_model(args):
+def build_model(args):                                              # 创建模型
     model = args.model
     if isinstance(model, list):
         model = model[0]
@@ -44,10 +44,10 @@ def build_model(args):
 
 
 SUPPORTED_MODELS = {
-    "transe":"cogdl.models.emb.transe.TransE",
-    "complex":"cogdl.models.emb.complex.ComplEx",
-    "distmult":"cogdl.models.emb.distmult.DistMult",
-    "rotate":"cogdl.models.emb.rotate.RotatE",
+    "transe": "cogdl.models.emb.transe.TransE",
+    "complex": "cogdl.models.emb.complex.ComplEx",
+    "distmult": "cogdl.models.emb.distmult.DistMult",
+    "rotate": "cogdl.models.emb.rotate.RotatE",
     "hope": "cogdl.models.emb.hope.HOPE",
     "spectral": "cogdl.models.emb.spectral.Spectral",
     "hin2vec": "cogdl.models.emb.hin2vec.Hin2vec",

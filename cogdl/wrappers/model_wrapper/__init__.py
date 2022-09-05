@@ -31,6 +31,7 @@ def fetch_model_wrapper(name):
     return getattr(module, class_name)
 
 
+# 记录模型的位置
 SUPPORTED_MW = {
     "triple_link_prediction_mw":"cogdl.wrappers.model_wrapper.link_prediction.TripleModelWrapper",
     "dgi_mw": "cogdl.wrappers.model_wrapper.node_classification.DGIModelWrapper",

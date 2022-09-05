@@ -531,9 +531,9 @@ class Graph(BaseGraph):
         return self
 
     def add_remaining_self_loops(self):
-        self._adj_full.add_remaining_self_loops()
+        self._adj_full.add_remaining_self_loops()               # 添加
         if self._adj_train is not None:
-            self._adj_train.add_remaining_self_loops()
+            self._adj_train.add_remaining_self_loops()          # 添加
 
     def padding_self_loops(self):
         self._adj.padding_self_loops()
